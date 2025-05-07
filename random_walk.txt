@@ -1,0 +1,2 @@
+节点: worlds -> to -> seek -> out -> new -> worlds -> to
+边: worlds->to, to->seek, seek->out, out->new, new->worlds, worlds->to

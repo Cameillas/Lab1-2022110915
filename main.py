@@ -15,6 +15,8 @@ import math
 import numpy as np
 from math import log
 # ==== WordGraph类完整实现 ====
+
+
 class WordGraph:
     def __init__(self):
         self.graph = defaultdict(lambda: defaultdict(int))
@@ -60,15 +62,15 @@ class WordGraph:
 
             # 绘制曲线边 (使用connectionstyle参数)
             edge_options = {
-            'arrowsize': 20,  # 比之前更大的箭头尺寸
-            'arrowstyle': '->',  # 明确的箭头样式
-            'width': 1.5,  # 稍粗的边线
-            'connectionstyle': 'arc3,rad=0.1',
-            'edge_color': 'darkgray',  # 更深的边颜色
-            'alpha': 0.9,
-            'node_size': 800,  # 单独设置node_size
-            'min_source_margin': 15,  # 箭头与源节点的最小距离
-            'min_target_margin': 15   # 箭头与目标节点的最小距离
+                'arrowsize': 20,  # 比之前更大的箭头尺寸
+                'arrowstyle': '->',  # 明确的箭头样式
+                'width': 1.5,  # 稍粗的边线
+                'connectionstyle': 'arc3,rad=0.1',
+                'edge_color': 'darkgray',  # 更深的边颜色
+                'alpha': 0.9,
+                'node_size': 800,  # 单独设置node_size
+                'min_source_margin': 15,  # 箭头与源节点的最小距离
+                'min_target_margin': 15   # 箭头与目标节点的最小距离
             }
 
             # 绘制节点和边
@@ -151,7 +153,8 @@ class WordGraph:
             current = words[i]
             next_word = words[i + 1]
             if current in self.graph:
-                bridges = [w for w in self.graph[current] if next_word in self.graph.get(w, {})]
+                bridges = [w for w in self.graph[current]
+                           if next_word in self.graph.get(w, {})]
                 if bridges:
                     result.append(random.choice(bridges))
             result.append(next_word)
@@ -217,7 +220,8 @@ class WordGraph:
         return f"找到从'{start}'到{len(paths)}个节点的最短路径", paths
 
     def highlight_path(self, path):
-        if not path: return
+        if not path:
+            return
         G = nx.DiGraph()
         edge_colors = []
         for src in self.graph:
@@ -273,8 +277,6 @@ class WordGraph:
         for src in self.graph:
             for dst, weight in self.graph[src].items():
                 self.nx_graph.add_edge(src, dst, weight=weight)
-
-
 
     def _compute_tfidf(self):
         """计算单词的TF-IDF权重"""
@@ -341,11 +343,11 @@ class WordGraph:
         return {node: float(pr[i]) for i, node in enumerate(nodes)}
 
     def cal_page_rank(self, word, **kwargs):
-            """
-            兼容原接口的PR查询
-            """
-            pr_dict = self.calculate_pagerank(**kwargs)
-            return round(pr_dict.get(word.lower(), 0), 4)
+        """
+        兼容原接口的PR查询
+        """
+        pr_dict = self.calculate_pagerank(**kwargs)
+        return round(pr_dict.get(word.lower(), 0), 4)
 
     def random_walk(self, walk_callback=None, delay=0.5, update_callback=None):
         """
@@ -427,10 +429,13 @@ class GraphUI(tk.Tk):
 
         # 文件选择区
         self.file_path = tk.StringVar()
-        file_entry = ttk.Entry(control_frame, textvariable=self.file_path, width=50)
+        file_entry = ttk.Entry(
+            control_frame, textvariable=self.file_path, width=50)
         file_entry.pack(side=tk.LEFT, padx=5)
-        ttk.Button(control_frame, text="浏览", command=self._browse_file).pack(side=tk.LEFT)
-        ttk.Button(control_frame, text="加载", command=self._load_file).pack(side=tk.LEFT, padx=5)
+        ttk.Button(control_frame, text="浏览",
+                   command=self._browse_file).pack(side=tk.LEFT)
+        ttk.Button(control_frame, text="加载", command=self._load_file).pack(
+            side=tk.LEFT, padx=5)
 
         # 功能按钮区
         func_frame = ttk.Frame(control_frame)
@@ -480,7 +485,8 @@ class GraphUI(tk.Tk):
         threading.Thread(target=load_task, daemon=True).start()
 
     def _show_graph(self):
-        if not self._check_loaded(): return
+        if not self._check_loaded():
+            return
         self._update_status("正在生成图谱...")
 
         def task():
@@ -502,6 +508,7 @@ class GraphUI(tk.Tk):
             self._output("✖ " + result)
         else:
             self._output("✓ " + result)
+
     def _bridge_dialog(self):
         d = BridgeDialog(self)
         self.wait_window(d)
@@ -521,14 +528,17 @@ class GraphUI(tk.Tk):
                     self._output(f"到 '{target}' 的最短路径: {' → '.join(path)}")
             else:
                 # 两个单词的情况
-                msg, path_dict = self.wg.calc_shortest_path(d.words[0], d.words[1])
+                msg, path_dict = self.wg.calc_shortest_path(
+                    d.words[0], d.words[1])
                 self._output(msg)  # 显示消息(会包含是否存在单词的信息)
                 if path_dict:  # 只有当path_dict不为空时才尝试显示路径
-                    self._output(f"路径：{' → '.join(list(path_dict.values())[0])}")
+                    self._output(
+                        f"路径：{' → '.join(list(path_dict.values())[0])}")
                     self._display_highlight(list(path_dict.values())[0])
 
     def _pr_dialog(self):
-        if not self._check_loaded(): return
+        if not self._check_loaded():
+            return
 
         def show_results():
             d = PRDialog(self)
@@ -612,7 +622,8 @@ class GraphUI(tk.Tk):
 
         # 添加实时显示区域
         path_var = tk.StringVar()
-        path_label = ttk.Label(walk_window, textvariable=path_var, wraplength=300)
+        path_label = ttk.Label(
+            walk_window, textvariable=path_var, wraplength=300)
         path_label.pack(pady=5)
 
         def update_display(path):
@@ -706,7 +717,7 @@ class GraphUI(tk.Tk):
         )
         if path:
             try:
-                with open(path, 'w',encoding='utf-8') as f:
+                with open(path, 'w', encoding='utf-8') as f:
                     f.write(self.output.get("1.0", tk.END))
                 self._output(f"结果已保存到：{os.path.basename(path)}")
             except Exception as e:
@@ -762,8 +773,10 @@ class BridgeDialog(tk.Toplevel):
         ttk.Entry(self, textvariable=self.word2).grid(row=1, column=1)
         btn_frame = ttk.Frame(self)
         btn_frame.grid(row=2, columnspan=2, pady=10)
-        ttk.Button(btn_frame, text="确定", command=self._submit).pack(side=tk.LEFT, padx=5)
-        ttk.Button(btn_frame, text="取消", command=self.destroy).pack(side=tk.LEFT)
+        ttk.Button(btn_frame, text="确定", command=self._submit).pack(
+            side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="取消",
+                   command=self.destroy).pack(side=tk.LEFT)
 
     def _submit(self):
         w1 = self.word1.get().strip()
@@ -794,7 +807,8 @@ class PathDialog(tk.Toplevel):
         input_frame = ttk.Frame(self)
         input_frame.pack(pady=10)
 
-        ttk.Label(input_frame, text="起始词：").grid(row=0, column=0, padx=5, pady=5)
+        ttk.Label(input_frame, text="起始词：").grid(
+            row=0, column=0, padx=5, pady=5)
         ttk.Entry(input_frame, textvariable=self.start).grid(row=0, column=1)
         ttk.Label(input_frame, text="目标词(可选)：").grid(row=1, column=0)
         ttk.Entry(input_frame, textvariable=self.end).grid(row=1, column=1)
@@ -803,8 +817,10 @@ class PathDialog(tk.Toplevel):
         btn_frame = ttk.Frame(self)
         btn_frame.pack(pady=10)
 
-        ttk.Button(btn_frame, text="查询", command=self._submit).pack(side=tk.LEFT, padx=5)
-        ttk.Button(btn_frame, text="取消", command=self.destroy).pack(side=tk.LEFT)
+        ttk.Button(btn_frame, text="查询", command=self._submit).pack(
+            side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="取消",
+                   command=self.destroy).pack(side=tk.LEFT)
 
     def _submit(self):
         s = self.start.get().strip()
@@ -833,8 +849,10 @@ class PRDialog(tk.Toplevel):
 
         btn_frame = ttk.Frame(self)
         btn_frame.pack(pady=15)
-        ttk.Button(btn_frame, text="计算", command=self._calculate).pack(side=tk.LEFT, padx=10)
-        ttk.Button(btn_frame, text="取消", command=self.destroy).pack(side=tk.LEFT)
+        ttk.Button(btn_frame, text="计算", command=self._calculate).pack(
+            side=tk.LEFT, padx=10)
+        ttk.Button(btn_frame, text="取消",
+                   command=self.destroy).pack(side=tk.LEFT)
 
     def _calculate(self):
         word = self.word.get().strip()
@@ -857,12 +875,14 @@ class GenTextDialog(tk.Toplevel):
         text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         ttk.Label(text_frame, text="输入原始文本:").pack(anchor=tk.W)
-        self.input_area = scrolledtext.ScrolledText(text_frame, wrap=tk.WORD, height=10)
+        self.input_area = scrolledtext.ScrolledText(
+            text_frame, wrap=tk.WORD, height=10)
         self.input_area.pack(fill=tk.BOTH, expand=True)
 
         btn_frame = ttk.Frame(text_frame)
         btn_frame.pack(pady=10)
-        ttk.Button(btn_frame, text="生成", command=self._confirm).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="生成", command=self._confirm).pack(
+            side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="取消", command=self.destroy).pack()
 
     def _confirm(self):
@@ -876,3 +896,4 @@ class GenTextDialog(tk.Toplevel):
 if __name__ == "__main__":
     app = GraphUI()
     app.mainloop()
+    # plt.close('all')  # 确保关闭所有图形窗口
